@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: shopping_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: shopping_cart
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - shopping_network
+
+  laravel:
+    build:
+      context: ./backend-laravel
+      dockerfile: Dockerfile
+    container_name: shopping_laravel
+    restart: always
+    environment:
+      APP_ENV: production
+      APP_KEY: ""
+      APP_DEBUG: false
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: shopping_cart
+      DB_USERNAME: laravel
+      DB_PASSWORD: secret
+      FIREBASE_CREDENTIALS: storage/app/firebase-credentials.json
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend-laravel/storage/app/firebase-credentials.json:/var/www/storage/app/firebase-credentials.json
+    depends_on:
+      - mysql
+    networks:
+      - shopping_network
+
+  nextjs:
+    build:
+      context: ./frontend-nextjs
+      dockerfile: Dockerfile
+    container_name: shopping_nextjs
+    restart: always
+    environment:
+      NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyAMfsyKXnDlWykK6s1OUX1yMFhyVm02OPk
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: fir-auth-5bfe8.firebaseapp.com
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: fir-auth-5bfe8
+      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: fir-auth-5bfe8.firebasestorage.app
+      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: 52198461378
+      NEXT_PUBLIC_FIREBASE_APP_ID: 1:52198461378:web:386a4b9ce0f2caa0b2505b
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - laravel
+    networks:
+      - shopping_network
+
+volumes:
+  mysql_data:
+
+networks:
+  shopping_network:
+    driver: bridge
