@@ -35,12 +35,12 @@ services:
       DB_DATABASE: shopping_cart
       DB_USERNAME: laravel
       DB_PASSWORD: secret
-      FIREBASE_CREDENTIALS: storage/app/firebase-credentials.json
+      FIREBASE_CREDENTIALS: storage/app/fir-auth-5bfe8-firebase-adminsdk-fbsvc-3dc76f5ee7.json
       FRONTEND_URL: http://localhost:3000
     ports:
       - "8000:8000"
     volumes:
-      - ./backend-laravel/storage/app/firebase-credentials.json:/var/www/storage/app/firebase-credentials.json
+      - ./backend-laravel/storage/app/fir-auth-5bfe8-firebase-adminsdk-fbsvc-3dc76f5ee7.json:/var/www/storage/app/fir-auth-5bfe8-firebase-adminsdk-fbsvc-3dc76f5ee7.json
     depends_on:
       - mysql
     networks:
@@ -64,6 +64,22 @@ services:
       - "3000:3000"
     depends_on:
       - laravel
+    networks:
+      - shopping_network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: shopping_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: laravel
+      PMA_PASSWORD: secret
+      PMA_DB: shopping_cart
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
     networks:
       - shopping_network
 

@@ -6,7 +6,6 @@ import { AuthGuard } from '@/components/AuthGuard'
 import { CartItem } from '@/components/CartItem'
 import { useGetCartQuery } from '@/store/api/cartApi'
 import { setCartItems, setLoading } from '@/store/slices/cartSlice'
-import { useCartSync } from '@/hooks/useCartSync'
 import { RootState } from '@/store/store'
 import Link from 'next/link'
 
@@ -16,9 +15,6 @@ function CartContent() {
   const syncing   = useSelector((state: RootState) => state.cart.syncing)
 
   const { data, isLoading } = useGetCartQuery()
-
-  // Activate debounced sync
-  useCartSync()
 
   useEffect(() => {
     if (data?.data) {

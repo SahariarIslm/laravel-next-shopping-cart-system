@@ -38,6 +38,7 @@ export const cartApi = createApi({
         method: 'POST',
         body: { items },
       }),
+      invalidatesTags: ['Cart'],
     }),
     removeCartItem: builder.mutation<{ success: boolean; message: string }, number>({
       query: (productId) => ({
